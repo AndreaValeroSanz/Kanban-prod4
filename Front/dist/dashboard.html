@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <script type="module" src="/src/Components/TaskColumn.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="/style.css" />
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.3/dragula.min.js'></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.3/dragula.min.css" />
+  <script src="/src/Controllers/DragDrop.js"></script>
+  <title>Dashboard - Midnight Coffee Warriors</title>
+</head>
+
+<body onload="dragInit()">
+  <div class="px-5">
+    <div class="row">
+      <div class="menu col-lg-2 topbar ">
+        <div class="text-center">
+          <p>Midnight Coffee Warriors</p>
+        </div>
+      </div>
+     
+      <div class="col-lg-10 topbar">
+        <div class="d-flex justify-content-end">
+        <my-navbar></my-navbar>
+        </div>
+      </div>
+    </div>
+
+   
+
+      <div class="py-3 col-lg-12">
+        <my-header></my-header>
+        <div class="row pt-5">
+          <div class="task-board d-flex justify-content-center gap-5 py-5">
+
+            <!-- Task Columns -->
+
+            <!-- Columna "On Hold" -->
+  <div class="col-lg-2">
+    <task-column id="on-hold" title="On hold" taskIcon="./public/Assets/iconosTaskColumns/On_hold.svg">
+      <div slot="content" class="overflow"></div>
+    </task-column>
+  </div>
+
+  <!-- Columna "Not Started" -->
+  <div class="col-lg-2">
+    <task-column id="not-started" title="Not Started" taskIcon="./public/Assets/iconosTaskColumns/Not_started.svg">
+      <div slot="content" class="overflow"></div>
+    </task-column>
+  </div>
+
+  <!-- Columna "In Progress" -->
+  <div class="col-lg-2">
+    <task-column id="in-progress" title="In progress" taskIcon="./public/Assets/iconosTaskColumns/In_progress.svg">
+      <div slot="content" class="overflow"></div>
+    </task-column>
+  </div>
+
+  <!-- Columna "Review Ready" -->
+  <div class="col-lg-2">
+    <task-column id="review-ready" title="Review Ready" taskIcon="./public/Assets/iconosTaskColumns/Review_ready.svg">
+      <div slot="content" class="overflow"></div>
+    </task-column>
+  </div>
+
+  <!-- Columna "Done" -->
+  <div class="col-lg-2">
+    <task-column id="done" title="Done" taskIcon="./public/Assets/iconosTaskColumns/Done.svg">
+      <div slot="content" class="overflow">
+      </div>
+    </task-column>
+  </div>
+</div>
+ <!-- <task-sticker-xl></task-sticker-xl> -->
+          <add-task></add-task>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script type="module" src="/src/Components/TaskSticker.js"></script>
+  
+  <!-- Load Controllers after components -->
+  <script type="module" src="/src/Controllers/TaskStickerController.js"></script>
+  <script type="module" src="/src/Controllers/FetchCard.js"></script>
+  <script type="module" src="/src/Components/AddTask.js"></script>
+  <script type="module" src="/src/Components/HeaderDashboard.js"></script>
+  <script type="module" src="/src/Components/Navigation.js"></script>
+  <script type="module" src="/src/Components/Projects.js"></script>
+  <script type="module" src="/src/Components/Navbar.js"></script>
+  <script type="module" src="/src/Controllers/CreateController.js"></script>
+  <script type="module" src="/main.js"></script>
+  <script type="module" src="/src/Components/Collaborators.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+  </script>
+
+</body>
+
+</html>

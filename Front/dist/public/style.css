@@ -1,0 +1,401 @@
+@font-face {
+  font-family: "GlacialIndifference";
+  src: url("/Fuentes/Glacial.otf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --blue: #2589bd;
+  --lightblue: #92c4de;
+  --yellow: #f5bb00;
+  --lightyellow: #fadd80;
+  --green: #4da167;
+  --lightgreen: #a6d0b3;
+  --pink: #db3069;
+  --lightpink: #ed98b4;
+  --black: #0e0e0e;
+  --white: #fafafa;
+  --gris: #dbdbdb;
+}
+
+* {
+  background-color: var(--white);
+  font-family: "GlacialIndifference", sans-serif;
+}
+
+body {
+  overflow: hidden;
+}
+
+.bg-gray {
+  background-color: var(--gris) !important;
+}
+
+.menu {
+  height: 50vh;
+}
+
+.topbar {
+  padding-top: 2vh;
+  height: 7vh;
+  border-bottom: 1px solid var(--gris);
+}
+
+.BorderRight {
+  border-right: 1px solid var(--gris);
+}
+
+.myprojects {
+  border-right: 1px solid var(--gris);
+  min-height: 100vh;
+}
+
+.NavItems {
+  display: flex;
+  gap: 16px;
+  text-align: baseline;
+  color: #787486;
+}
+
+.NavItems:hover {
+  color: var(--black);
+  fill: var(--black);
+}
+
+.list-unstyled {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.button-container {
+  position: relative;
+}
+
+.button-container i {
+  font-size: 12px;
+}
+
+.button-container li {
+  width: 100%;
+}
+
+.btn.boton {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+}
+
+.boton::after {
+  content: "\F5D4";
+  font-family: bootstrap-icons !important;
+  display: block;
+  /*position: absolute;*/
+  left: 0;
+  opacity: 0.1;
+  transition: opacity 0.3s;
+
+}
+
+.boton:hover::after {
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+li {
+  list-style-type: none;
+}
+
+.task-column {
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba (0, 0, 0, 0.1);
+  width: 200px;
+  min-height: 300px;
+}
+
+.task-column h2 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: "Raleway", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.task-column hr {
+  border-top: 2px solid #dbdbdb;
+}
+
+.btn-new-task {
+  color: #5030e5;
+}
+
+.btn-new-task:hover {
+  color: black;
+}
+
+.taskIcon {
+  width: 40px;
+  height: 40px;
+}
+
+.post-it {
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba (0, 0, 0, 0.1);
+  width: 200px;
+  min-height: 300px;
+}
+
+.drag {
+  cursor: pointer;
+}
+
+.drag.gu-transit {
+  opacity: 0.5;
+}
+
+.drag.gu-mirror {
+  position: fixed;
+  z-index: 9999;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.placeholder {
+  background-color: #f8f9fa;
+  border: 1px dashed #dee2e6;
+  padding: 10px;
+  text-align: center;
+  color: #6c757d;
+}
+
+.placeholder p {
+  margin: 0;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.overflow {
+  max-height: 58vh;
+  /* Set a height limit for the container */
+  overflow-y: auto;
+  /* Enable vertical scrolling */
+}
+
+.overflow::-webkit-scrollbar {
+  display: none;
+}
+
+.task-board {
+  display: flex;
+  justify-content: space-around;
+  /* Makes sure columns have space */
+  flex-wrap: nowrap;
+  /* Ensures columns don't wrap to new lines */
+  gap: 20px;
+}
+
+.toggle-button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.toggle-button:hover {
+  background-color: #e0e0e0;
+}
+
+.btn-transparent {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: black !important;
+}
+
+.bi-chevron-down {
+  font-size: 1em;
+  /* Ajusta el tamaño según necesites */
+  margin-left: 0.2em;
+  /* Espacio entre el texto y la flecha */
+}
+
+.dropdown-toggle::after {
+  display: none !important;
+}
+
+task-sticker,
+task-sticker-xl {
+  transition: all 0.3s ease-in-out;
+}
+
+.modalDLogin {
+  border-radius: 8px;
+  padding-top: 9vh;
+  box-shadow: 0 4px 6px rgba (0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.imgMCW {
+  width: 469px;
+  justify-items: flex-end;
+}
+
+.modal-content-login {
+  max-width: 400px;
+  width: 100%;
+  padding: 4em;
+}
+
+.signinButton {
+  background-color: #702a5e;
+  color: #ffffff;
+}
+
+.signinButton:hover {
+  background-color: #fed789 !important;
+  color: #343434 !important;
+}
+
+
+
+.custom-card {
+  width: 300px;
+  height: 180px;
+  border-radius: 8px;
+  border-style: solid;
+  border-width: 1px;
+  background-color: #f4c0f3;
+}
+
+.card-title-board {
+  font-size: 16px;
+  /* Ajusta el tamaño si es necesario */
+  margin-top: auto;
+  text-align: left;
+  padding-left: 10px;
+  padding-top: 6px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: transparent;
+  border-bottom: none;
+}
+
+.delete-btn {
+  background: #ffffff;
+  border: none;
+  color: #6c757d;
+  transition: color 0.2s;
+}
+#deleteIcon{
+  background: #ffffff;
+}
+.delete-btn:hover {
+  color: #dc3545;
+}
+.delete-btn:hover > #deleteIcon {
+  color: #ffffff;
+  background: #dc3545;
+  border-color: #dc3545;
+}
+
+.createProjectButton {
+  background-color: #702a5e;
+  color: #ffffff;
+}
+.createProjectButton:hover {
+  background-color: #fed789 !important;
+  color: #343434 !important;
+}
+
+.submitButton {
+  background-color: #fed789;
+  color: #343434;
+}
+.submitButton:hover {
+  background-color: #702a5e !important;
+  color: #ffffff !important;
+}
+
+.edit-btn {
+  color: #702a5e;
+  background: #ffffff;
+  border: none;
+  transition: color 0.2s;
+}
+#editIcon{
+  background: #ffffff;
+}
+.edit-btn:hover {
+  color: #fed789;
+  background: #fed789;
+  border-color: #fed789;
+}
+.edit-btn:hover>#editIcon {
+  color: #ffffff;
+  background: #fed789;
+  border-color: #fed789;
+}
+
+.dashboard-btn {
+  color: #702a5e;
+  background: #ffffff;
+  border: none;
+  transition: color 0.2s;
+}
+#dashboardIcon {
+  background: #ffffff;
+}
+.dashboard-btn:hover {
+  color: #fed789;
+  background: #fed789;
+  border-color: #fed789;
+}
+.dashboard-btn:hover>#dashboardIcon {
+  color: #ffffff;
+  background: #fed789;
+  border-color: #fed789;
+}
+
+#projectsContainer {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 15px;
+}
+
+#backButton {
+  color: #702a5e;
+  outline-color: #702a5e;
+  border-color: #702a5e;
+  margin-left: 20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  border-radius: 5px;
+  transition: color 0.2s;
+}
+#backButton:hover {
+  color: #fed789;
+  background: #fed789;
+  border-color: #fed789;
+}
+#backButton:hover>#backIcon {
+  color: #ffffff;
+  background: #fed789;
+  border-color: #fed789;
+}
