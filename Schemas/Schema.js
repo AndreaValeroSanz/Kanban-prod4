@@ -72,6 +72,20 @@ const typeDefs = gql`
 
     deleteProject(id: ID!): Project
   }
+
+  type Subscription {
+   cardUpdated(projectId: ID!): Card
+  }
+   type Card{
+    _id: ID!
+    title: String!
+    description: String!
+    duedate: String
+    type: String
+    color: String
+    user_id: ID!
+    projects_id: ID!
+  }
 `;
 
 export default typeDefs;

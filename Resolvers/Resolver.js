@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 import Card from '../models/card.js'; // Ensure you have the Card model
 import Project from '../models/project.js';
-
+import pubsub from '../config/pubsub.js';
 
 const SECRET_KEY = "gommit";
 
@@ -11,37 +11,26 @@ const resolvers = {
   Query: {
     getAllCards: async (_, { projectId }, { userId }) => {
       try {
-        // Verificar si el usuario está autenticado
         if (!userId) {
           throw new Error('No autorizado');
         }
-        console.log("Project ID:", projectId);
 
-
-        // Si no se pasa un projectId, devolver todas las tarjetas del usuario
         let query = { user_id: userId };
-
-        // Si se pasa un projectId, agregar el filtro para projectId
         if (projectId) {
           query.projects_id = projectId;
         }
 
-        // Buscar las tarjetas que coincidan con los filtros
         const cards = await Card.find(query);
         return cards;
       } catch (error) {
         throw new Error(error.message);
       }
     },
-
-
-
     projects: async (_, __, { userId }) => {
       try {
         if (!userId) {
           throw new Error("No autorizado");
         }
-
         const projects = await Project.find({ user_id: userId });
         return projects;
       } catch (error) {
@@ -68,20 +57,12 @@ const resolvers = {
           { expiresIn: '3h' }
         );
 
-        return {
-          userId: user._id,
-          token,
-          user,
-        };
+        return { userId: user._id, token, user };
       } catch (error) {
         throw new Error(error.message);
       }
     },
-    createCard: async (
-      _,
-      { title, description, duedate, type, color, projects_id },
-      { userId }
-    ) => {
+    createCard: async (_, { title, description, duedate, type, color, projects_id }, { userId }) => {
       try {
         if (!userId) {
           throw new Error('No autorizado');
@@ -101,6 +82,9 @@ const resolvers = {
         });
 
         const savedCard = await newCard.save();
+
+        pubsub.publish(`CARD_UPDATED_${projectIdToUse}`, { cardUpdated: savedCard });
+
         return savedCard;
       } catch (error) {
         throw new Error(error.message);
@@ -122,16 +106,11 @@ const resolvers = {
         throw new Error(error.message);
       }
     },
-    editCard: async (
-      _,
-      { id, title, description, duedate, color },
-      { userId }
-    ) => {
+    editCard: async (_, { id, title, description, duedate, color }, { userId }) => {
       try {
         if (!userId) {
           throw new Error('No autorizado');
         }
-
 
         const updatedCard = await Card.findByIdAndUpdate(
           id,
@@ -139,9 +118,7 @@ const resolvers = {
             ...(title && { title }),
             ...(description && { description }),
             ...(duedate && { duedate }),
-
             ...(color && { color }),
-
           },
           { new: true }
         );
@@ -149,6 +126,8 @@ const resolvers = {
         if (!updatedCard) {
           throw new Error('Tarjeta no encontrada');
         }
+
+        pubsub.publish(`CARD_UPDATED_${updatedCard.projects_id}`, { cardUpdated: updatedCard });
 
         return updatedCard;
       } catch (error) {
@@ -161,13 +140,11 @@ const resolvers = {
           throw new Error('No autorizado');
         }
 
-        // Find the card and make sure it belongs to the current user
         const card = await Card.findOne({ _id: id, user_id: userId });
         if (!card) {
           throw new Error('Tarjeta no encontrada o no autorizada');
         }
 
-        // Update the type
         card.type = type;
         const updatedCard = await card.save();
 
@@ -176,20 +153,16 @@ const resolvers = {
         throw new Error(`Error al actualizar el tipo de tarjeta: ${error.message}`);
       }
     },
-
-    createProject: async (_, { title, userId }) => {
+    createProject: async (_, { title }, { userId }) => {
       try {
-        // Crear un nuevo proyecto con los datos recibidos
-        const newProject = new Project({
-          title,
-          user_id: userId, // Vincular con el ID del usuario
-        });
+        if (!userId) {
+          throw new Error('No autorizado');
+        }
 
-        // Guardar el proyecto en la base de datos
+        const newProject = new Project({ title, user_id: userId });
         const savedProject = await newProject.save();
         return savedProject;
       } catch (error) {
-        console.error("Error al crear el proyecto:", error);
         throw new Error("No se pudo crear el proyecto.");
       }
     },
@@ -199,49 +172,37 @@ const resolvers = {
           throw new Error('No autorizado');
         }
 
-        // Buscar el proyecto con el ID proporcionado
         const project = await Project.findOne({ _id: id, user_id: userId });
-
         if (!project) {
           throw new Error('Proyecto no encontrado o no autorizado');
         }
 
-        // Actualizar el título del proyecto
-        project.title = title || project.title;  // Si no se pasa título, mantén el actual
-
-        // Guardar el proyecto actualizado
+        project.title = title || project.title;
         const updatedProject = await project.save();
-
         return updatedProject;
       } catch (error) {
         throw new Error(`Error al editar el proyecto: ${error.message}`);
       }
     },
-
     deleteProject: async (_, { id }) => {
       try {
-        // Verificar si el proyecto existe antes de eliminarlo
         const project = await Project.findById(id);
         if (!project) {
           throw new Error("Proyecto no encontrado");
         }
 
-        // Eliminar todas las cards asociadas al proyecto
         await Card.deleteMany({ projects_id: id });
-
-        // Eliminar el proyecto
         const deletedProject = await Project.findByIdAndDelete(id);
 
-        if (!deletedProject) {
-          throw new Error("No se pudo eliminar el proyecto.");
-        }
-
-        console.log(`Proyecto eliminado: ${deletedProject.title}`);
-        return deletedProject; // Asegúrate de devolver el proyecto eliminado
+        return deletedProject;
       } catch (error) {
-        console.error("Error al eliminar el proyecto:", error);
         throw new Error("No se pudo eliminar el proyecto.");
       }
+    },
+  },
+  Subscription: {
+    cardUpdated: {
+      subscribe: (_, { projects_id }) => pubsub.asyncIterator(`CARD_UPDATED_${projects_id}`),
     },
   },
 };
