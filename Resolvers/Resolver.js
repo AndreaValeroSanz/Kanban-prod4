@@ -1,8 +1,9 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import User from '../models/user.js';
-import Card from '../models/card.js'; // Ensure you have the Card model
-import Project from '../models/project.js';
+import {pubsub, EVENTS} from "../pubsub.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import User from "../models/user.js";
+import Card from "../models/card.js"; // Ensure you have the Card model
+import Project from "../models/project.js";
 
 
 const SECRET_KEY = "gommit";
@@ -13,10 +14,9 @@ const resolvers = {
       try {
         // Verificar si el usuario está autenticado
         if (!userId) {
-          throw new Error('No autorizado');
+          throw new Error("No autorizado");
         }
         console.log("Project ID:", projectId);
-
 
         // Si no se pasa un projectId, devolver todas las tarjetas del usuario
         let query = { user_id: userId };
@@ -33,8 +33,6 @@ const resolvers = {
         throw new Error(error.message);
       }
     },
-
-
 
     projects: async (_, __, { userId }) => {
       try {
@@ -54,18 +52,18 @@ const resolvers = {
       try {
         const user = await User.findOne({ email });
         if (!user) {
-          throw new Error('Usuario no encontrado');
+          throw new Error("Usuario no encontrado");
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-          throw new Error('Contraseña incorrecta');
+          throw new Error("Contraseña incorrecta");
         }
 
         const token = jwt.sign(
           { userId: user._id, email: user.email },
           SECRET_KEY,
-          { expiresIn: '3h' }
+          { expiresIn: "3h" }
         );
 
         return {
@@ -84,7 +82,7 @@ const resolvers = {
     ) => {
       try {
         if (!userId) {
-          throw new Error('No autorizado');
+          throw new Error("No autorizado");
         }
 
         const defaultProjectId = "67224b9d9040a876aa6e7013";
@@ -101,6 +99,7 @@ const resolvers = {
         });
 
         const savedCard = await newCard.save();
+        pubsub.publish(EVENTS.CARD.CREATED, { cardCreated: savedCard });
         return savedCard;
       } catch (error) {
         throw new Error(error.message);
@@ -109,14 +108,19 @@ const resolvers = {
     deleteCard: async (_, { id }, { userId }) => {
       try {
         if (!userId) {
-          throw new Error('No autorizado');
+          throw new Error("No autorizado");
         }
 
-        const deletedCard = await Card.findOneAndDelete({ _id: id, user_id: userId });
+        const deletedCard = await Card.findOneAndDelete({
+          _id: id,
+          user_id: userId,
+        });
         if (!deletedCard) {
-          throw new Error('Tarjeta no encontrada o no autorizada para eliminar');
+          throw new Error(
+            "Tarjeta no encontrada o no autorizada para eliminar"
+          );
         }
-
+        pubsub.publish(EVENTS.CARD.DELETED, { cardDeleted: deletedCard });
         return deletedCard;
       } catch (error) {
         throw new Error(error.message);
@@ -129,9 +133,8 @@ const resolvers = {
     ) => {
       try {
         if (!userId) {
-          throw new Error('No autorizado');
+          throw new Error("No autorizado");
         }
-
 
         const updatedCard = await Card.findByIdAndUpdate(
           id,
@@ -141,30 +144,36 @@ const resolvers = {
             ...(duedate && { duedate }),
 
             ...(color && { color }),
-
           },
           { new: true }
         );
 
         if (!updatedCard) {
-          throw new Error('Tarjeta no encontrada');
+          throw new Error("Tarjeta no encontrada");
         }
+        pubsub.publish("CARD_UPDATED", { cardUpdated: updatedCard });
 
         return updatedCard;
       } catch (error) {
         throw new Error(`Error al editar la tarjeta: ${error.message}`);
       }
     },
+  },
+  Subscription: {
+    cardUpdated: {
+      subscribe: () => pubsub.asyncIterator(["CARD_UPDATED"]),
+    },
+
     updateCardType: async (_, { id, type }, { userId }) => {
       try {
         if (!userId) {
-          throw new Error('No autorizado');
+          throw new Error("No autorizado");
         }
 
         // Find the card and make sure it belongs to the current user
         const card = await Card.findOne({ _id: id, user_id: userId });
         if (!card) {
-          throw new Error('Tarjeta no encontrada o no autorizada');
+          throw new Error("Tarjeta no encontrada o no autorizada");
         }
 
         // Update the type
@@ -173,7 +182,9 @@ const resolvers = {
 
         return updatedCard;
       } catch (error) {
-        throw new Error(`Error al actualizar el tipo de tarjeta: ${error.message}`);
+        throw new Error(
+          `Error al actualizar el tipo de tarjeta: ${error.message}`
+        );
       }
     },
 
@@ -196,18 +207,18 @@ const resolvers = {
     editProject: async (_, { id, title }, { userId }) => {
       try {
         if (!userId) {
-          throw new Error('No autorizado');
+          throw new Error("No autorizado");
         }
 
         // Buscar el proyecto con el ID proporcionado
         const project = await Project.findOne({ _id: id, user_id: userId });
 
         if (!project) {
-          throw new Error('Proyecto no encontrado o no autorizado');
+          throw new Error("Proyecto no encontrado o no autorizado");
         }
 
         // Actualizar el título del proyecto
-        project.title = title || project.title;  // Si no se pasa título, mantén el actual
+        project.title = title || project.title; // Si no se pasa título, mantén el actual
 
         // Guardar el proyecto actualizado
         const updatedProject = await project.save();
@@ -242,6 +253,17 @@ const resolvers = {
         console.error("Error al eliminar el proyecto:", error);
         throw new Error("No se pudo eliminar el proyecto.");
       }
+    },
+  },
+  Subscription: {
+    cardUpdated: {
+      subscribe: () => pubsub.asyncIterator([EVENTS.CARD.UPDATED]),
+    },
+    cardCreated: {
+      subscribe: () => pubsub.asyncIterator([EVENTS.CARD.CREATED]),
+    },
+    cardDeleted: {
+      subscribe: () => pubsub.asyncIterator([EVENTS.CARD.DELETED]),
     },
   },
 };

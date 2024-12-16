@@ -1,4 +1,6 @@
 import { gql } from 'apollo-server-express';
+import { pubsub } from '../pubsub.js';
+
 const typeDefs = gql`
   type Card {
     _id: ID!
@@ -32,8 +34,8 @@ const typeDefs = gql`
   }
 
   type Query {
-  getAllCards(projectId: ID): [Card]
-  projects: [Project!]!
+    getAllCards(projectId: ID): [Card]
+    projects: [Project!]!
   }
 
   type Project {
@@ -57,12 +59,12 @@ const typeDefs = gql`
     deleteCard(id: ID!): Card!
 
     editCard(
-        id: ID!
-        title: String
-        description: String
-        duedate: String
-        color: String
-      ): Card!
+      id: ID!
+      title: String
+      description: String
+      duedate: String
+      color: String
+    ): Card!
     
     updateCardType(id: ID!, type: String!): Card!
 
@@ -71,6 +73,12 @@ const typeDefs = gql`
     editProject(id: ID!, title: String!): Project!
 
     deleteProject(id: ID!): Project
+  }
+
+  type Subscription {
+    cardUpdated: Card!
+    cardCreated: Card!
+    cardDeleted: Card!
   }
 `;
 
