@@ -1,4 +1,7 @@
+import { io } from "socket.io-client";
 import { createProject, editProject, deleteProject } from "../Controllers/ProjectsController.js";
+
+const socket = io("http://localhost:3000");
 
 document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem("token");
@@ -95,7 +98,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
             `;
 
+            //Subscripicion websocket !!!!!!!!!!!!!!!!!!!!!
             list.appendChild(listItem);
+
+            listItem.querySelector(".subscribe-btn").addEventListener("click", () => {
+                const boardId = project._id; // Usamos el ID del proyecto como boardId
+                socket.emit("subscribeToBoard", { boardId });
+                console.log(`Suscrito al tablero: ${boardId}`);
+                alert(`Te has suscrito al tablero "${project.title}"`);
+            });
 
             // Eventos de edición
             listItem.querySelector(".edit-btn").addEventListener("click", async () => {
@@ -160,6 +171,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     cancelButton.addEventListener("click", () => {
         createProjectForm.style.display = "none";
+    });
+
+    // Escuchar notificaciones del servidor !!!!!!!!!!!!!!!!!
+    socket.on("boardUpdate", (data) => {
+        console.log("¡Actualización en el tablero!", data);
+        alert(`El tablero "${data.boardId}" ha sido actualizado.`);
+        loadAndRenderProjects(); // Recargar proyectos si hay cambios
     });
 
     // Inicializar lista de proyectos
