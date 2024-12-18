@@ -311,11 +311,11 @@ task-sticker-xl {
   border-color: #dc3545;
 }
 
-.createProjectButton {
+.createProjectButton, #favoriteIcon {
   background-color: #702a5e;
   color: #ffffff;
 }
-.createProjectButton:hover {
+.createProjectButton:hover, #favoriteIcon:hover{
   background-color: #fed789 !important;
   color: #343434 !important;
 }

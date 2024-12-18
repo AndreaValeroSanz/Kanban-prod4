@@ -21,10 +21,15 @@ class Header extends HTMLElement {
               <div class="d-flex justify-content-center">
                 <div class="btn-group dropend">
                   <div class="d-flex justify-content-between align-items-around ">
+                
                     <h1>${projectName}</h1>
                     <button id="backButton" class="btn btn-outline-secondary">
                       <i id="backIcon" class="bi bi-arrow-left"></i>
                     </button>
+                     <button  class="btn btn-transparent" >
+                     <i id="favoriteIcon" class="bi bi-bookmark-star"></i> 
+                               
+                  </button>
                   </div>
                 </div>
               </div>
