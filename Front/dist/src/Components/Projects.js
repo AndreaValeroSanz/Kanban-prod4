@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             listItem.innerHTML = `
                 <div class="d-flex align-items-center" style="background: #ffffff;">
-                <button class= btn btn-sm btn-outline-primary subscribe-btn"
+                <button class= btn btn-sm btn-outline-primary subscribe-btn">
                 <i id="subscribeIcon" class="bi bi-bookmark-star"></i></button>
                     <button class="btn btn-sm btn-outline-primary dashboard-btn me-3" data-id="${project._id}">
                         <i id="dashboardIcon" class="bi bi-box-arrow-in-right"></i>
