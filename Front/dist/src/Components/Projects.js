@@ -1,4 +1,8 @@
+import { io } from "socket.io-client";
 import { createProject, editProject, deleteProject } from "../Controllers/ProjectsController.js";
+
+const socket = io("http://localhost:3000");
+
 
 document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem("token");
@@ -77,8 +81,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             listItem.innerHTML = `
                 <div class="d-flex align-items-center" style="background: #ffffff;">
-                <button class= btn btn-sm btn-outline-primary subscribe-btn">
-                <i id="subscribeIcon" class="bi bi-bookmark-star"></i></button>
+                <button id="favoriteIcon" class="btn btn-sm btn-outline-primary subscribe-btn me-1 
+                <i class=bi bi-bookmark-star"</i></button>
                     <button class="btn btn-sm btn-outline-primary dashboard-btn me-3" data-id="${project._id}">
                         <i id="dashboardIcon" class="bi bi-box-arrow-in-right"></i>
                     </button>
@@ -94,7 +98,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </div>
             `;
 
-            list.appendChild(listItem);
+            
+            
+       //Subscripicion websocket !!!!!!!!!!!!!!!!!!!!!
+                list.appendChild(listItem);
+
+                listItem.querySelector(".subscribe-btn").addEventListener("click", () => {
+                    const boardId = project._id; // Usamos el ID del proyecto como boardId
+                    socket.emit("subscribeToBoard", { boardId });
+                    console.log(`Suscrito al tablero: ${boardId}`);
+                    alert(`Te has suscrito al tablero "${project.title}"`);
+                });
+
+         
 
             // Eventos de edición
             listItem.querySelector(".edit-btn").addEventListener("click", async () => {
@@ -161,6 +177,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         createProjectForm.style.display = "none";
     });
 
+    socket.on("boardUpdate", (data) => {
+        console.log("¡Actualización en el tablero!", data);
+        alert(`El tablero "${data.boardId}" ha sido actualizado.`);
+        loadAndRenderProjects(); // Recargar proyectos si hay cambios
+    });
+
     // Inicializar lista de proyectos
     await loadAndRenderProjects();
 });
+
