@@ -24,22 +24,22 @@ const app = express();
 const httpServer = createServer(app);
 
 const startServer = async () => {
-  // Crear el esquema GraphQL
+  // Create GraphQL schema
   const schema = makeExecutableSchema({
     typeDefs,
     resolvers,
   });
 
-  // Configurar ApolloServer
+  // Configure ApolloServer
   const server = new ApolloServer({
     schema,
     context: ({ req }) => {
       try {
-        auth(req, null, () => {}); // Verificar autenticación
-        return { userId: req.userId, pubsub }; // Contexto con userId y pubsub
+        auth(req, null, () => {}); // Verify authentication
+        return { userId: req.userId, pubsub }; // Provide userId and pubsub in context
       } catch (err) {
-        console.error('Error de autenticación:', err.message);
-        throw new Error('No autorizado');
+        console.error('Authentication error:', err.message);
+        throw new Error('Unauthorized');
       }
     },
   });
@@ -47,18 +47,20 @@ const startServer = async () => {
   await server.start();
   server.applyMiddleware({ app });
 
-  // Configurar WebSocketServer para suscripciones
+  // Configure WebSocketServer for subscriptions on port 4200
   const wsServer = new WebSocketServer({
-    server: httpServer,
+    port: 4200, // Separate port for WebSocket
     path: '/graphql',
   });
 
   useServer({ schema, context: () => ({ pubsub }) }, wsServer);
 
-  // Conexión a la base de datos
+  console.log('Subscriptions available at ws://localhost:4200/graphql');
+
+  // Connect to the database
   connectDB();
 
-  // Configurar archivos estáticos
+  // Configure static file handling
   const uploadDir = path.join(__dirname, 'front', 'dist', 'public', 'avatars');
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
@@ -69,7 +71,7 @@ const startServer = async () => {
   app.use(express.urlencoded({ limit: '2gb', extended: true }));
   app.use('/avatars', express.static(uploadDir));
 
-  // Configurar Socket.IO para manejar tareas y avatares
+  // Configure Socket.IO for tasks and avatars on HTTP server
   const io = new Server(httpServer, {
     cors: {
       origin: '*',
@@ -78,13 +80,13 @@ const startServer = async () => {
   });
 
   io.on('connection', (socket) => {
-    console.log('Cliente conectado:', socket.id);
+    console.log('Client connected:', socket.id);
 
     socket.on('upload_task_file', async (data, callback) => {
       const { cardId, fileName, fileContent } = data;
 
       if (!cardId) {
-        callback({ success: false, message: 'ID de tarea no proporcionado.' });
+        callback({ success: false, message: 'Task ID not provided.' });
         return;
       }
 
@@ -94,11 +96,11 @@ const startServer = async () => {
       }
 
       const filePath = path.join(taskUploadDir, `${cardId}_${fileName}`);
-      console.log('Guardando archivo en:', filePath);
+      console.log('Saving file to:', filePath);
 
       try {
         await fs.promises.writeFile(filePath, fileContent, 'base64');
-        console.log('Archivo guardado:', filePath);
+        console.log('File saved:', filePath);
 
         const fileUrl = `/uploads/tasks/${cardId}_${fileName}`;
         const result = await Card.findOneAndUpdate(
@@ -108,14 +110,14 @@ const startServer = async () => {
         );
 
         if (!result) {
-          callback({ success: false, message: 'Tarea no encontrada.' });
+          callback({ success: false, message: 'Task not found.' });
           return;
         }
 
-        callback({ success: true, message: 'Archivo subido correctamente.', fileUrl });
+        callback({ success: true, message: 'File uploaded successfully.', fileUrl });
       } catch (err) {
-        console.error('Error al procesar el archivo:', err);
-        callback({ success: false, message: 'Error interno del servidor.' });
+        console.error('Error processing file:', err);
+        callback({ success: false, message: 'Internal server error.' });
       }
     });
 
@@ -123,7 +125,7 @@ const startServer = async () => {
       const { userId, fileName, fileContent } = data;
 
       if (!userId) {
-        callback({ success: false, message: 'Usuario no autenticado' });
+        callback({ success: false, message: 'User not authenticated.' });
         return;
       }
 
@@ -131,32 +133,31 @@ const startServer = async () => {
 
       try {
         await fs.promises.writeFile(avatarPath, fileContent, 'base64');
-        console.log('Avatar guardado en:', avatarPath);
+        console.log('Avatar saved to:', avatarPath);
 
         const avatarUrl = `/avatars/${fileName}`;
         await User.findByIdAndUpdate(userId, { avatar: avatarUrl });
 
-        callback({ success: true, message: 'Avatar subido correctamente', avatarUrl });
+        callback({ success: true, message: 'Avatar uploaded successfully.', avatarUrl });
       } catch (err) {
-        console.error('Error al guardar el avatar:', err);
-        callback({ success: false, message: 'Error interno del servidor.' });
+        console.error('Error saving avatar:', err);
+        callback({ success: false, message: 'Internal server error.' });
       }
     });
 
     socket.on('disconnect', () => {
-      console.log('Cliente desconectado:', socket.id);
+      console.log('Client disconnected:', socket.id);
     });
   });
 
-  // Iniciar servidor
+  // Start HTTP server
   const PORT = process.env.PORT || 3000;
   httpServer.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}${server.graphqlPath}`);
-    console.log(`Socket.IO corriendo en http://localhost:${PORT}`);
-    console.log(`Suscripciones disponibles en ws://localhost:${PORT}/graphql`);
+    console.log(`Server running at http://localhost:${PORT}${server.graphqlPath}`);
+    console.log(`Socket.IO running at http://localhost:${PORT}`);
   });
 };
 
 startServer().catch((err) => {
-  console.error('Error al iniciar el servidor:', err);
+  console.error('Error starting server:', err);
 });

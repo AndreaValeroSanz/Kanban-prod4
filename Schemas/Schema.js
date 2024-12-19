@@ -1,5 +1,4 @@
 import { gql } from 'apollo-server-express';
-import { pubsub } from '../pubsub.js';
 
 const typeDefs = gql`
   type Card {
