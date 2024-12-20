@@ -73,8 +73,8 @@ const resolvers = {
           user,
         };
       } catch (error) {
-        console.error("Error during login:", error);
-        throw new Error("Error during login");
+        console.error("Error durante el login:", error);
+        throw new Error("Error durante el login");
       }
     },
 
@@ -187,10 +187,15 @@ const resolvers = {
     },
 
     // Create a new project
-    createProject: async (_, { title }, { userId }) => {
+    createProject: async (_, { title, userId }, { userId: contextUserId }) => {
       try {
-        if (!userId) {
+        if (!contextUserId) {
           throw new Error("No autorizado");
+        }
+
+        // Asegurarse de que userId sea un array
+        if (!Array.isArray(userId)) {
+          throw new Error("El userId debe ser un array");
         }
 
         const newProject = new Project({
@@ -201,8 +206,8 @@ const resolvers = {
         const savedProject = await newProject.save();
         return savedProject;
       } catch (error) {
-        console.error("Error creating project:", error);
-        throw new Error("Error creating project");
+        console.error("Error al editar el proyecto:", error);
+        throw new Error("Error al editar el proyecto");
       }
     },
 
@@ -222,8 +227,8 @@ const resolvers = {
         const updatedProject = await project.save();
         return updatedProject;
       } catch (error) {
-        console.error("Error editing project:", error);
-        throw new Error("Error editing project");
+        console.error("Error al editar el proyecto:", error);
+        throw new Error("Error al editar el proyecto");
       }
     },
 

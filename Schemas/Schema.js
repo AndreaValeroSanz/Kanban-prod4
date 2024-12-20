@@ -37,11 +37,11 @@ const typeDefs = gql`
     projects: [Project!]!
   }
 
-  type Project {
+type Project {
     _id: ID!
-    user_id: ID!
+    user_id: [ID!]!
     title: String!
-  }
+}
 
   type Mutation {
     login(email: String!, password: String!): AuthPayload!
@@ -67,7 +67,7 @@ const typeDefs = gql`
     
     updateCardType(id: ID!, type: String!): Card!
 
-    createProject(title: String!, userId: String!): Project!
+    createProject(title: String!, userId: [String!]!): Project!
     
     editProject(id: ID!, title: String!): Project!
 

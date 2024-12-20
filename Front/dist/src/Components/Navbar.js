@@ -98,7 +98,7 @@ class Navbar extends HTMLElement {
       localStorage.setItem("userAvatar", user.avatar || "");
       localStorage.setItem("userId", user._id);
 
-      alert("Login successful");
+      alert("Login correcto");
 
       const modal = bootstrap.Modal.getInstance(document.getElementById("loginModal"));
       modal.hide();

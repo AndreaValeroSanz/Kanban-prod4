@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("userEmail", user.email);
             localStorage.setItem("userAvatar", user.avatar || "");
             localStorage.setItem("userId", user._id);
-            alert("Login successful");
+            alert("Login correcto");
 
             // Redirigir después del login exitoso
             window.location.href = "projects.html";

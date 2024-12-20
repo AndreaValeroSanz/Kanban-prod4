@@ -147,7 +147,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        const newProject = await createProject(title, userId, token);
+        // Convertir userId a un array
+        const userIdArray = [userId];
+
+        const newProject = await createProject(title, userIdArray, token);
         if (newProject) {
             createProjectForm.style.display = "none";
             document.getElementById("projectTitle").value = "";
