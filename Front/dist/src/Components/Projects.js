@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        // Convertir userId a un array
+        // Convertir userId a un array por los cambios de la bbdd (sorry - uWu)
         const userIdArray = [userId];
 
         const newProject = await createProject(title, userIdArray, token);
